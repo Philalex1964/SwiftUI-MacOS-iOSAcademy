@@ -13,6 +13,8 @@ struct Option: Hashable {
 }
 
 struct ContentView: View {
+    @State private var currentOption = 0
+    
     let options: [Option] = [
         .init(title: "Home", imageName: "house"),
         .init(title: "About", imageName: "info.circle"),
@@ -22,9 +24,17 @@ struct ContentView: View {
     
     var body: some View {
         NavigationView {
-            ListView(options: options)
+            ListView(
+                options: options,
+                currentSelection: $currentOption
+            )
             
-            MainView()
+            switch currentOption {
+            case 1:
+                Text("About iOS Academy View")
+            default:
+                MainView()
+            }
         }
         .frame(minWidth: 600, minHeight: 400)
     }
@@ -32,9 +42,11 @@ struct ContentView: View {
 
 struct ListView: View {
     let options: [Option]
+    @Binding var currentSelection: Int
     
     var body: some View {
         VStack {
+            let current = options[currentSelection]
             ForEach(options, id: \.self) { option in
                 HStack {
                     Image(systemName: option.imageName)
@@ -43,11 +55,19 @@ struct ListView: View {
                         .frame(width: 20)
                     
                     Text(option.title)
+                        .foregroundColor(current == option ? Color.blue : Color.gray)
                     
                     Spacer()
                 }
             }
             .padding()
+            .onTapGesture {
+                if currentSelection == 1 {
+                    currentSelection = 0
+                } else {
+                    currentSelection = 1
+                }
+            }
         }
         
         Spacer()
@@ -67,13 +87,18 @@ struct MainView: View {
         VStack {
             Image("header")
                 .resizable()
-                .aspectRatio(contentMode: .fit)
+                .aspectRatio(contentMode: .fill)
             
             LazyVGrid(columns: cols) {
                 ForEach(videoImages, id: \.self) { imageName in
-                    Image(imageName)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
+//                    VStack {
+                        Image(imageName)
+                            .resizable()
+                            .aspectRatio(contentMode: .fit)
+//
+//                        Text("Video title goes here")
+//                            .bold()
+//                    }
                 }
             }
             
